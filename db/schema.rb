@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_11_30_070812) do
+ActiveRecord::Schema.define(version: 2021_05_20_104345) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -42,48 +42,81 @@ ActiveRecord::Schema.define(version: 2020_11_30_070812) do
   end
 
   create_table "categories", force: :cascade do |t|
-    t.string "title"
+    t.string "category_name"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
     t.text "body"
     t.integer "position"
     t.string "image"
-    t.datetime "created_at", precision: 6, null: false
-    t.datetime "updated_at", precision: 6, null: false
-  end
-
-  create_table "images", force: :cascade do |t|
-    t.string "imagable_type"
-    t.bigint "imagable_id"
-    t.string "image"
-    t.datetime "created_at", precision: 6, null: false
-    t.datetime "updated_at", precision: 6, null: false
-    t.index ["imagable_type", "imagable_id"], name: "index_images_on_imagable_type_and_imagable_id"
+    t.string "category_name_eng"
   end
 
   create_table "items", force: :cascade do |t|
     t.string "name"
-    t.integer "sale_price"
-    t.integer "list_price"
-    t.text "video"
-    t.bigint "category_id"
+    t.integer "price"
     t.text "description"
-    t.bigint "user_id"
-    t.string "image"
-    t.integer "status", default: 0
     t.decimal "reviews_average", default: "0.0"
     t.integer "reviews_count"
-    t.integer "view_count", default: 0
-    t.string "zipcode"
-    t.string "address1"
-    t.string "address2"
-    t.datetime "start_at"
-    t.datetime "end_at"
-    t.integer "_type"
-    t.decimal "lat", precision: 15, scale: 10
-    t.decimal "lng", precision: 15, scale: 10
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
-    t.index ["category_id"], name: "index_items_on_category_id"
+    t.integer "category_id"
+    t.string "brand"
+    t.bigint "user_id"
+    t.string "image"
+    t.string "category_name"
     t.index ["user_id"], name: "index_items_on_user_id"
+  end
+
+  create_table "likes", force: :cascade do |t|
+    t.bigint "user_id", null: false
+    t.bigint "item_id", null: false
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["item_id"], name: "index_likes_on_item_id"
+    t.index ["user_id"], name: "index_likes_on_user_id"
+  end
+
+  create_table "line_items", force: :cascade do |t|
+    t.bigint "order_id", null: false
+    t.bigint "option_id", null: false
+    t.integer "unit_price"
+    t.integer "quantity"
+    t.integer "total"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["option_id"], name: "index_line_items_on_option_id"
+    t.index ["order_id"], name: "index_line_items_on_order_id"
+  end
+
+  create_table "options", force: :cascade do |t|
+    t.bigint "item_id", null: false
+    t.string "name"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["item_id"], name: "index_options_on_item_id"
+  end
+
+  create_table "orders", force: :cascade do |t|
+    t.bigint "user_id"
+    t.string "receiver_name"
+    t.string "receiver_phone"
+    t.integer "total"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.integer "status"
+    t.string "receiver_address"
+    t.index ["user_id"], name: "index_orders_on_user_id"
+  end
+
+  create_table "reviews", force: :cascade do |t|
+    t.bigint "user_id", null: false
+    t.bigint "item_id", null: false
+    t.text "review_content"
+    t.integer "review_rate"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["item_id"], name: "index_reviews_on_item_id"
+    t.index ["user_id"], name: "index_reviews_on_user_id"
   end
 
   create_table "users", force: :cascade do |t|
@@ -103,7 +136,6 @@ ActiveRecord::Schema.define(version: 2020_11_30_070812) do
     t.string "unconfirmed_email"
     t.string "name", default: ""
     t.string "phone"
-    t.string "image"
     t.string "address1"
     t.string "address2"
     t.string "zipcode"
@@ -118,19 +150,24 @@ ActiveRecord::Schema.define(version: 2020_11_30_070812) do
     t.decimal "lng", precision: 15, scale: 10
     t.string "en_address"
     t.text "description"
-    t.integer "point", default: 0
-    t.decimal "reviews_average", default: "0.0"
-    t.integer "reviews_count"
     t.string "uid"
-    t.string "provider"
     t.string "device_token"
     t.string "device_type"
-    t.string "link"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
+    t.string "user_id", default: "", null: false
     t.index ["confirmation_token"], name: "index_users_on_confirmation_token", unique: true
     t.index ["email"], name: "index_users_on_email", unique: true
     t.index ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true
   end
 
+  add_foreign_key "items", "categories"
+  add_foreign_key "likes", "items"
+  add_foreign_key "likes", "users"
+  add_foreign_key "line_items", "options"
+  add_foreign_key "line_items", "orders"
+  add_foreign_key "options", "items"
+  add_foreign_key "orders", "users"
+  add_foreign_key "reviews", "items"
+  add_foreign_key "reviews", "users"
 end

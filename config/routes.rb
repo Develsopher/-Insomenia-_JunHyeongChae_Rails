@@ -22,10 +22,27 @@ Rails.application.routes.draw do
                sessions: "users/sessions",
                registrations: "users/registrations"
              }
-
+  resources :users
+  
   resources :categories
-  resources :items
-  resources :images do
-    post :dropzone, on: :collection
+
+  resources :items do
+    resources :options, only: [:index, :create]
   end
+  
+
+  # resources :items
+  get '/items/category/:id' => 'items#category_item'
+  get '/items/:id' => 'items#eachindex'
+  # get '/items' => 'items#index'
+  # post '/items' => 'items#create'
+  # get '/items/:id' => 'items#show'
+  # put '/items/:id' => 'items#update'
+  # delete '/itmes/:id' => 'items#destroy'
+  # resources :categories
+  # resources :items, only: [:index, :show] except:
+
+  # resources :images do
+  #   post :dropzone, on: :collection
+  # end
 end

@@ -1,5 +1,6 @@
 class CategoryEachSerializer < Panko::Serializer
-  attributes :id, :title, :position, :image_path
+  attributes :id, :category_name, :image, :category_name_eng
+  # attributes :id, :title, :position, :image_path
 
-  delegate :image_path, to: :object
+  delegate :image, to: :object
 end
