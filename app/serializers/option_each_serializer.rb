@@ -1,3 +1,3 @@
 class OptionEachSerializer < Panko::Serializer
-  attributes :id, :item_id, :name 
+  attributes :id, :item_id, :name, :price
 end

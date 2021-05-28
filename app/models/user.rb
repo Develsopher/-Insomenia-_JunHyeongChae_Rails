@@ -5,6 +5,7 @@ class User < ApplicationRecord
   has_many :orders, dependent: :nullify
   has_many :reviews, dependent: :destroy
   has_many :likes, dependent: :destroy
-  has_many :likde_items, through: :likes, source: :item
+  has_many :liked_items, through: :likes, source: :item
+  has_many :reviewed_items, through: :reviews, source: :item
   enum gender: { unknown: 0, male: 1, female: 2 }
 end

@@ -22,12 +22,19 @@ Rails.application.routes.draw do
                sessions: "users/sessions",
                registrations: "users/registrations"
              }
-  resources :users
+  resources :users do
+    resources :liked_items
+  end
   
   resources :categories
 
   resources :items do
-    resources :options, only: [:index, :create]
+    resources :options, only: [:index, :create, :update]
+    resources :likes
+  end
+
+  resources :likes do
+    resources :items
   end
   
 
